@@ -1,3 +1,10 @@
+#目标文件的url
+NO_TRANS_FILE_URL = "http://data.gdeltproject.org/gdeltv2/masterfilelist.txt"
+TRANS_FILE_URL = "http://data.gdeltproject.org/gdeltv2/masterfilelist-translation.txt"
+
+#url文件名
+NO_TRANS_FILE_NAME = "masterfilelist.txt"
+TRANS_FILE_NAME = "masterfilelist-translation.txt"
 
 # 结果文件保存目录
 NO_TRANS_FILE_DIR = 'D:/gdelt2/notrans'
@@ -6,6 +13,7 @@ TRANS_FILE_DIR = 'D:/gdelt2/trans'
 # 需下载文件的url匹配的正则
 NO_TRANS_RE = '2018\d+\.(gkg|export).+'
 TRANS_RE = '2018\d+(\.translation)\.(gkg|export).+'
+DOUBLE_RE = '2018\d+(|\.translation)\.(gkg|export).+'
 
 # 数据库连接
 DB_URL = 'mysql+pymysql://root:123456@localhost:3306/gdelt?charset=utf8'
