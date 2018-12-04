@@ -4,14 +4,15 @@ import random
 import re
 import time
 import traceback
+import zipfile
 
 import aiohttp
 
 from user_agent import agents
 
-dir = 'D:/gdelt3/no_trans'
+dir = 'E:/gdelt3/trans'
 failed_file_name = 'fail_download.txt'
-re_fliter = re.compile('2018\d+\.(gkg|export).+')
+re_fliter = re.compile('2018\d+(\.translation)\.(gkg|export).+')
 
 
 async def download_file(url, semaphore):
@@ -31,15 +32,23 @@ async def download_file(url, semaphore):
             async with semaphore:
                 async with aiohttp.ClientSession() as session:
                     try:
-                        async with session.get(url, headers=headers, timeout=15) as resp:
+                        async with session.get(url, headers=headers, timeout=120) as resp:
                             if resp.status == 200:
-                                print("%s下载成功" % fullname)
+                                print("%s响应成功" % fullname)
                                 with open(fullname, 'wb') as f:
                                     while 1:
                                         chunk = await resp.content.read(1024000)
                                         if not chunk:
                                             break
                                         f.write(chunk)
+                                try:
+                                    # 校验看能不能作为zip文件打开
+                                    with zipfile.ZipFile(fullname, 'r') as f:
+                                        pass
+                                    print("%s下载成功" % fullname)
+                                except Exception as e:
+                                    print("%s下载不完整" % fullname)
+                                    write_failed_url(url)
                             else:
                                 write_failed_url(url)
                     except Exception as e:
@@ -58,7 +67,7 @@ def write_failed_url(url):
 
 def start_download(urls):
     loop = asyncio.get_event_loop()
-    semaphore = asyncio.Semaphore(50)  # 限制并发量为50
+    semaphore = asyncio.Semaphore(100)  # 限制并发量为50
     tasks = [download_file(url, semaphore) for url in urls]
     start = time.time()
     loop.run_until_complete(asyncio.wait(tasks))
